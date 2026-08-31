@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Box-Office 2025 — Classement de rentabilité</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0E1116;
+    --surface:#171B22;
+    --surface-2:#1F242D;
+    --gold:#E3B341;
+    --crimson:#B3122E;
+    --ink:#F5F3EE;
+    --muted:#8B93A1;
+    --rule: rgba(245,243,238,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 20% -10%, rgba(227,179,65,0.08), transparent 40%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    padding:64px 24px 40px;
+    max-width:920px;
+    margin:0 auto;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--gold);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:8px;height:8px;border-radius:50%;
+    background:var(--crimson);
+    box-shadow:0 0 0 3px rgba(179,18,46,0.25);
+  }
+  h1{
+    font-family:'Bebas Neue',sans-serif;
+    font-weight:400;
+    font-size:clamp(48px,9vw,88px);
+    line-height:0.92;
+    letter-spacing:0.01em;
+    margin:18px 0 12px;
+  }
+  h1 span{color:var(--gold);}
+  .subtitle{
+    color:var(--muted);
+    font-size:16px;
+    max-width:560px;
+    line-height:1.5;
+  }
+
+  /* ---------- states ---------- */
+  #etat{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 24px 40px;
+    color:var(--muted);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+  }
+  #etat.erreur{color:var(--crimson);}
+
+  /* ---------- leaderboard ---------- */
+  main{max-width:920px;margin:0 auto;padding:0 24px 100px;}
+
+  .rangee{
+    display:grid;
+    grid-template-columns:64px 56px 1fr auto;
+    align-items:center;
+    gap:20px;
+    padding:22px 4px;
+    position:relative;
+  }
+  .rangee:not(:last-child){
+    border-bottom:1px dashed var(--rule);
+  }
+
+  .rang{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:40px;
+    color:var(--muted);
+    line-height:1;
+  }
+  .rang.top3{color:var(--gold);}
+
+  .affiche{
+    width:56px;height:80px;
+    object-fit:cover;
+    border-radius:2px;
+    background:var(--surface-2);
+    box-shadow:0 6px 16px rgba(0,0,0,0.4);
+  }
+  .affiche.vide{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:10px;}
+
+  .infos .titre{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:26px;
+    letter-spacing:0.01em;
+    margin-bottom:6px;
+  }
+  .infos .meta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .infos .meta b{color:var(--ink);font-weight:600;}
+
+  .ratio{
+    text-align:right;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .ratio .valeur{
+    font-size:28px;
+    font-weight:600;
+    color:var(--gold);
+    line-height:1;
+  }
+  .ratio .label{
+    font-size:10px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    margin-top:4px;
+  }
+
+  footer{
+    max-width:920px;margin:0 auto;
+    padding:40px 24px 80px;
+    color:var(--muted);
+    font-size:13px;
+    border-top:1px solid var(--rule);
+  }
+  footer a{color:var(--gold);text-decoration:none;}
+
+  @media (max-width:640px){
+    .rangee{grid-template-columns:40px 44px 1fr;}
+    .ratio{grid-column:1/-1;text-align:left;display:flex;align-items:baseline;gap:8px;margin-top:8px;}
+  }
+
+  @media (prefers-reduced-motion:no-preference){
+    .rangee{animation:apparition 0.4s ease backwards;}
+  }
+  @keyframes apparition{
+    from{opacity:0;transform:translateY(6px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">TMDb</div>
+  <h1>Box-office <span>2025</span></h1>
+  <p class="subtitle">
+    Classement mondial par rentabilité réelle — recettes ÷ budget — plutôt
+    que par recettes brutes. Un petit film qui rapporte gros passe devant
+    un blockbuster cher.
+  </p>
+</header>
+
+<div id="etat">Chargement du classement…</div>
+<main id="liste" aria-live="polite"></main>
+
+<footer>
+  Source : <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDb API</a>.
+  Budgets et recettes mondiales déclaratifs, communautaires — à prendre comme
+  ordre de grandeur. Films avec budget &lt; 1M$ écartés (données souvent
+  mal renseignées).
+</footer>
+
+<script>
+async function chargerClassement(){
+  const etat = document.getElementById('etat');
+  const liste = document.getElementById('liste');
+
+  try{
+    const resp = await fetch('/api/films');
+    const data = await resp.json();
+
+    if(!resp.ok || data.error){
+      etat.textContent = "Erreur : " + (data.error || "impossible de charger le classement.");
+      etat.classList.add('erreur');
+      return;
+    }
+
+    if(!data.films || data.films.length === 0){
+      etat.textContent = "Aucun film trouvé pour 2025 avec budget et recettes renseignés.";
+      return;
+    }
+
+    etat.remove();
+
+    const formatUSD = (n) => '$' + n.toLocaleString('en-US');
+
+    data.films.forEach((film, index) => {
+      const rang = document.createElement('div');
+      rang.className = 'rangee';
+      rang.style.animationDelay = (index * 0.03) + 's';
+
+      const affiche = film.affiche
+        ? `<img class="affiche" src="${film.affiche}" alt="Affiche de ${film.titre}">`
+        : `<div class="affiche vide">—</div>`;
+
+      rang.innerHTML = `
+        <div class="rang ${index < 3 ? 'top3' : ''}">${index + 1}</div>
+        ${affiche}
+        <div class="infos">
+          <div class="titre">${film.titre}</div>
+          <div class="meta">
+            <span>Sortie : <b>${film.date_sortie || '—'}</b></span>
+            <span>Budget : <b>${formatUSD(film.budget_usd)}</b></span>
+            <span>Recettes : <b>${formatUSD(film.recettes_mondiales_usd)}</b></span>
+          </div>
+        </div>
+        <div class="ratio">
+          <div class="valeur">×${film.ratio_rentabilite}</div>
+          <div class="label">rentabilité</div>
+        </div>
+      `;
+      liste.appendChild(rang);
+    });
+
+  }catch(err){
+    etat.textContent = "Erreur réseau : " + err.message;
+    etat.classList.add('erreur');
+  }
+}
+
+chargerClassement();
+</script>
+
+</body>
+</html>

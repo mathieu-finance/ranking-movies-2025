@@ -1,0 +1,3 @@
+# Aucune dépendance externe : api/films.py n'utilise que la bibliothèque
+# standard Python (urllib, json, http.server). Ce fichier est laissé présent
+# pour que Vercel reconnaisse explicitement le runtime Python.

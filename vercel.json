@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/films.py": {
+      "maxDuration": 30
+    }
+  }
+}
